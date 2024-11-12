@@ -1,53 +1,64 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
-enum NUM {NAME = 32, XINGBIE = 7};
+enum NUM {NAME = 32, GENDER = 7};
 
 struct student
 {
     char name[NAME];
-    char xingbie[XINGBIE];
+    char gender[GENDER];
     int age;
     long long number;
-} student;
+};
 
-void caidan(void);
-void write(void);
-void print(void);
-void xiugai(void);
+void menu(struct student information[], int len, int *number);
+void write(struct student information[], int *Actual_input);
+void print(struct student information[], const int Actual_input);
+void modify(struct student information[], const int Actual_input);
 
 int main(int argc, char const *argv[])
 {
-    caidan();
+    int number;
+    printf("请输入有多少个学生：");
+    scanf("%d", &number);
+    struct student information[number];
+    int len = sizeof(information) / sizeof(information[0]);
+    menu(information, len, &number);
     return 0;
 }
 
-void caidan(void)
+void menu(struct student information[], int len, int *number)
 {
-    int xuanze;
+    int select;
     int temp;
     int control = 0;
+    static int Actual_input = 0;
     do
     {
-        printf("1.录入信息 2.打印信息 3.修改信息 0.退出，请选择：");
-        scanf("%d", &xuanze);
+        if(*number > Actual_input)
+        {
+            *number = Actual_input;
+        }
+        printf("1.录入信息 2.查找信息 3.修改信息 0.退出，请选择：");
+        scanf("%d", &select);
         if(control == 0)
         {
-            temp = xuanze;
+            temp = select;
             if(temp == 1)
             {
                 control++;
             }
         }
-        switch(xuanze)
+        switch(select)
         {
             case 1:
-                write();
+                write(information, &Actual_input);
                 break;
             case 2:
                 if(temp == 1)
                 {
-                    print();
+                    print(information, Actual_input);
                 }
                 else
                 {
@@ -55,7 +66,7 @@ void caidan(void)
                 }
                 break;
             case 3:
-                xiugai();
+                modify(information, Actual_input);
                 break;
             case 0:
                 printf("退出\n");
@@ -64,114 +75,176 @@ void caidan(void)
                 printf("不是有效操作，请重新选择\n");
                 break;
         }
-    } while(xuanze);
+    } while(select);
 }
 
-void print(void)
+void print(struct student information[], const int Actual_input)
 {
-    printf("你的姓名是：%s\n", student.name);
-    printf("你的性别是：%s\n", student.xingbie);
-    printf("你的年龄是：%d\n", student.age);
-    printf("你的学号是：%lld\n", student.number);
-    printf("信息打印完毕\n");
+    int select;
+    printf("一共有%d组数据，请选择查看：", Actual_input);
+    scanf("%d", &select);
+    printf("第%d组数据：\n", select);
+    printf("姓名：%s\n", information[select - 1].name);
+    printf("性别：%s\n", information[select - 1].gender);
+    printf("年龄：%d\n", information[select - 1].age);
+    printf("学号：%lld\n", information[select - 1].number);
+    printf("打印完毕\n");
 }
 
-void write(void)
+void write(struct student information[], int *Actual_input)
 {
-    printf("请输入你的姓名：");
-    scanf("%s", student.name);
-start:
-    printf("请输入你的性别：");
-    scanf("%s", student.xingbie);
-    if(strcmp(student.xingbie, "男") != 0 && strcmp(student.xingbie, "女") != 0 && strcmp(student.xingbie, "未知") != 0)
+    static int i = 0;
+    int temp = 0;
+    for(;i < 100;i++)
     {
-        printf("请输入男、女或未知！\n");
-        goto start;
+        temp = 0;
+        printf("请输入你的姓名：");
+        scanf("%s", information[i].name);
+        while(1)
+        {
+            printf("请输入你的性别：");
+            scanf("%s", information[i].gender);
+            if(strcmp(information[i].gender, "男") != 0 && strcmp(information[i].gender, "女") != 0 && strcmp(information[i].gender, "未知") != 0)
+            {
+                printf("请输入男、女或未知！\n");
+                while(getchar() != '\n');
+                continue;
+            }
+            else
+            {
+                break;
+            }
+        }
+        while(1)
+        {
+            printf("请输入你的年龄：");
+            if(scanf("%d", &information[i].age) == 0)
+            {
+                printf("请输入数字！\n");
+                while(getchar() != '\n');
+                continue;
+            }
+            else
+            {
+                break;
+            }
+        }
+        while(1)
+        {
+            printf("请输入你的学号：");
+            if(scanf("%lld", &information[i].number) == 0)
+            {
+                printf("请输入数字！\n");
+                while(getchar() != '\n');
+                continue;
+            }
+            else
+            {
+                break;
+            }
+        }
+        printf("信息录入完毕！\n");
+        (*Actual_input)++;
+        char str[10];
+        do
+        {
+            printf("是否继续录入：");
+            scanf("%3s", str);
+            //printf("%s\n", str);  调试用
+            while(getchar() != '\n');
+            if(strcmp(str, "是") == 0)
+            {
+                break;
+            }
+            else if(strcmp(str, "否") == 0)
+            {
+                temp = 1;
+                i++;
+                break;
+            }
+            else
+            {
+                printf("请输入是或否！\n");
+                continue;
+            }
+        } while(1);
+        if(temp == 1)
+        {
+            break;
+        }
     }
-    printf("请输入你的年龄：");
-    scanf("%d", &student.age);
-    printf("请输入你的学号：");
-    scanf("%lld", &student.number);
-    printf("信息录入完毕\n");
 }
 
-void xiugai(void)
+void modify(struct student information[], const int Actual_input)
 {
-    print();
-    int xuanze;
+    int select;
+    printf("一共有%d组数据，请选择修改：", Actual_input);
+    scanf("%d", &select);
+    printf("姓名：%s\n", information[select - 1].name);
+    printf("性别：%s\n", information[select - 1].gender);
+    printf("年龄：%d\n", information[select - 1].age);
+    printf("学号：%lld\n", information[select - 1].number);
+    int num;
     do
     {
-        printf("1.修改姓名 2.修改性别 3.修改年龄 4.修改学号 0.退出，请选择：");
-        scanf("%d", &xuanze);
-        switch(xuanze)
+        printf("1.姓名 2.性别 3.年龄 4.学号 0.退出，请输入：");
+        if(scanf("%d", &num) == 0)
+        {
+            printf("请输入数字！\n");
+            while(getchar() != '\n');
+            continue;
+        }
+        switch(num)
         {
             case 1:
-                for(int i = 0;i < NAME;i++)
+                printf("请输入新的名字：");
+                if(scanf("%s", information[select - 1].name) == 0)
                 {
-                    student.name[i] = '\0';
-                }
-                printf("请输入你的姓名：");
-                
-                if(scanf("%s", student.name) != 0)
-                {
-                    printf("修改成功\n");
+                    printf("修改失败！\n");
                 }
                 else
                 {
-                    printf("修改失败\n");
-                    while(getchar() != '\n');
+                    printf("修改成功！\n");
                 }
                 break;
             case 2:
-                for(int i = 0;i < XINGBIE;i++)
+                printf("请输入新的性别：");
+                if(scanf("%s", information[select - 1].gender) == 0)
                 {
-                    student.xingbie[i] = '\0';
-                }
-                printf("请输入你的性别：");
-                if(scanf("%s", student.xingbie) != 0)
-                {
-                    printf("修改成功\n");
+                    printf("修改失败！\n");
                 }
                 else
                 {
-                    printf("修改失败\n");
-                    while(getchar() != '\n');
+                    printf("修改成功！\n");
                 }
                 break;
             case 3:
-                printf("请输入你的年龄：");
-                if(scanf("%d", &student.age) != 0)
+                printf("请输入新的年龄：");
+                if(scanf("%d", &information[select - 1].age) == 0)
                 {
-                    printf("修改成功\n");
+                    printf("请输入数字！\n");
                 }
                 else
                 {
-                    printf("修改失败\n");
-                    while(getchar() != '\n');
+                    printf("修改成功！\n");
                 }
                 break;
             case 4:
-                printf("请输入你的学号：");
-                if(scanf("%lld", &student.number) != 0)
+                printf("请输入新的学号：");
+                if(scanf("%lld", &information[select - 1].number) == 0)
                 {
-                    printf("修改成功\n");
+                    printf("请输入数字！\n");
                 }
                 else
                 {
-                    printf("修改失败\n");
-                    while(getchar() != '\n');
+                    printf("修改成功！\n");
                 }
                 break;
             case 0:
                 printf("退出\n");
                 break;
             default:
-                printf("不是有效操作，请重新输入！\n");
-                break;
+                printf("不是有效操作！\n");
         }
-    } while(xuanze);
-    if(xuanze != 0)
-    {
-        print();
-    }
+    } while(num != 0);
 }
